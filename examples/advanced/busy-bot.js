@@ -85,7 +85,7 @@ bot
  */
 
 let busyIndicator    = false
-let busyAnnouncement = `Automatic Reply: I cannot read your message because I'm busy now, will talk to you when I get back.`
+let busyAnnouncement = ['该死，我还什么都不会说', '骗你的']
 
 bot.on('message', async function(msg) {
   log.info('Bot', '(message) %s', msg)
@@ -109,24 +109,25 @@ bot.on('message', async function(msg) {
   if (receiver.id === 'filehelper') {
     if (text === '#status') {
       await filehelper.say('in busy mode: ' + busyIndicator)
-      await filehelper.say('auto reply: ' + busyAnnouncement)
+      await filehelper.say('auto reply: ' + busyAnnouncement[0])
 
     } else if (text === '#free') {
       busyIndicator = false
       await filehelper.say('auto reply stopped.')
 
-    } else if (/^#busy/i.test(text)) {
+    }
+    else if (/^#busy/i.test(text)) {
 
       busyIndicator = true
       await filehelper.say('in busy mode: ' + 'ON')
 
       const matches = text.match(/^#busy (.+)$/i)
       if (!matches || !matches[1]) {
-        await filehelper.say('auto reply message: "' + busyAnnouncement + '"')
+        await filehelper.say('auto reply message: "' + busyAnnouncement[0] + '"')
 
       } else {
-        busyAnnouncement = matches[1]
-        await filehelper.say('set auto reply to: "' + busyAnnouncement + '"')
+        // busyAnnouncement = matches[1]
+        await filehelper.say('set auto reply to: "' + busyAnnouncement[0] + '"')
 
       }
     }
@@ -149,20 +150,19 @@ bot.on('message', async function(msg) {
   /**
    * 1. Send busy anoncement to contact
    */
-  if (!room) {
-    await msg.say(busyAnnouncement)
-    return
-  }
+  const isHidden = () => { return Math.random() * 10 > 9 ? 1 : 0 }
+  await msg.say(busyAnnouncement[isHidden])
+  return
 
   /**
    * 2. If there's someone mentioned me in a room,
    *  then send busy annoncement to room and mention the contact who mentioned me.
    */
-  const contactList = await msg.mention()
-  const contactIdList = contactList.map(c => c.id)
-  if (contactIdList.includes(this.userSelf().id)) {
-    await msg.say(busyAnnouncement, sender)
-  }
+  // const contactList = await msg.mention()
+  // const contactIdList = contactList.map(c => c.id)
+  // if (contactIdList.includes(this.userSelf().id)) {
+  //   await msg.say(busyAnnouncement, sender)
+  // }
 
 })
 
