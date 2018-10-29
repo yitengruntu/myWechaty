@@ -151,7 +151,7 @@ bot.on('message', async function(msg) {
    * 1. Send busy anoncement to contact
    */
   const isHidden = () => { return Math.random() * 10 > 9 ? 1 : 0 }
-  await msg.say(busyAnnouncement[isHidden])
+  await msg.say(busyAnnouncement[isHidden()])
   return
 
   /**
