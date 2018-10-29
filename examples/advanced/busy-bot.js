@@ -150,10 +150,22 @@ bot.on('message', async function(msg) {
   /**
    * 1. Send busy anoncement to contact
    */
-  const isHidden = () => { return Math.random() * 10 > 9 ? 1 : 0 }
-  await msg.say(busyAnnouncement[isHidden()])
-  return
 
+  const isHidden = () => { return Math.random() * 10 > 9 ? 1 : 0 }
+  if (!room) {
+    await msg.say(busyAnnouncement[isHidden()])
+    return
+  }
+
+  /**
+   * 2. If there's someone mentioned me in a room,
+   *  then send busy annoncement to room and mention the contact who mentioned me.
+   */
+  const contactList = await msg.mention()
+  const contactIdList = contactList.map(c => c.id)
+  if (contactIdList.includes(this.userSelf().id)) {
+    await msg.say(busyAnnouncement[isHidden()], sender)
+  }
   /**
    * 2. If there's someone mentioned me in a room,
    *  then send busy annoncement to room and mention the contact who mentioned me.
