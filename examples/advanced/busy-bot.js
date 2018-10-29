@@ -86,9 +86,6 @@ bot
 
 let busyIndicator    = false
 let busyAnnouncement = `Automatic Reply: I cannot read your message because I'm busy now, will talk to you when I get back.`
-let busyAnnouncement_other = ''
-let settingTrigger = 0
-let sendingTrigger = 0
 
 bot.on('message', async function(msg) {
   log.info('Bot', '(message) %s', msg)
@@ -128,13 +125,7 @@ bot.on('message', async function(msg) {
         await filehelper.say('auto reply message: "' + busyAnnouncement + '"')
 
       } else {
-        if (settingTrigger === 0) {
-          busyAnnouncement = matches[1]
-          settingTrigger = 1
-        } else {
-          busyAnnouncement_other = matches[1]
-          settingTrigger = 0
-        }
+        busyAnnouncement = matches[1]
         await filehelper.say('set auto reply to: "' + busyAnnouncement + '"')
 
       }
@@ -159,13 +150,7 @@ bot.on('message', async function(msg) {
    * 1. Send busy anoncement to contact
    */
   if (!room) {
-    if (sendingTrigger === 0) {
-      await msg.say(busyAnnouncement)
-      sendingTrigger = 1
-    } else {
-      await msg.say(busyAnnouncement_other)
-      sendingTrigger = 0
-    }
+    await msg.say(busyAnnouncement)
     return
   }
 
