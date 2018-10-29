@@ -85,7 +85,7 @@ bot
  */
 
 let busyIndicator    = false
-let busyAnnouncement = ['该死，我还什么都不会说', '骗你的']
+let busyAnnouncement = ['该死，我还什么都不会说', 'sd']
 
 bot.on('message', async function(msg) {
   log.info('Bot', '(message) %s', msg)
@@ -104,6 +104,14 @@ bot.on('message', async function(msg) {
 
   if (!sender || !receiver) {
     return
+  }
+
+  if (/张吉/i.test(text)) {
+    msg.say('张吉，出来挨打')
+  }
+
+  if (/体脂称/i.test(text)) {
+    msg.say('是秤！！！')
   }
 
   if (receiver.id === 'filehelper') {
