@@ -113,10 +113,8 @@ bot
   } catch (e) {
     logMsg = e.message
   }
-
   console.log(logMsg)
   await fileHelper.say(logMsg)
-
 })
 
 bot.start()

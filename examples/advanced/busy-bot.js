@@ -95,6 +95,8 @@ bot
         await friendship.accept()
         break
     }
+  } catch (e) {
+    console.log(e)
   }
 })
 
