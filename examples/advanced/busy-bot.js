@@ -43,6 +43,16 @@ Loading... please wait for QrCode Image Url and then scan to login.
 `)
 
 let bot
+const fullName = `Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Ruiz y Picasso`
+
+const atReturnText = (text) => {
+  const busyAnnouncement = ['喵', '我不会说人话']
+  const isHidden = () => { return Math.random() * 10 > 9 ? 1 : 0 }
+  if (/全名/i.test(text) || /真名/i.test(text) || /大名/i.test(text)) {
+    return fullName
+  }
+  return busyAnnouncement[isHidden()]
+}
 
 const token = config.token
 
@@ -77,15 +87,22 @@ bot
 
   log.info('Bot', msg)
   await this.say(msg)
-
+})
+.on('friendship', async friendship => {
+  try {
+    switch (friendship.type()) {
+      case Friendship.Type.Receive:
+        await friendship.accept()
+        break
+    }
+  }
 })
 
 /**
  * Global Event: message
  */
 
-let busyIndicator    = false
-let busyAnnouncement = ['该死，我还什么都不会说', 'sd']
+let busyIndicator    = true
 
 bot.on('message', async function(msg) {
   log.info('Bot', '(message) %s', msg)
@@ -108,40 +125,47 @@ bot.on('message', async function(msg) {
 
   if (/张吉/i.test(text)) {
     msg.say('张吉，出来挨打')
+    return
   }
 
   if (/体脂称/i.test(text)) {
     msg.say('是秤！！！')
-  }
-
-  if (receiver.id === 'filehelper') {
-    if (text === '#status') {
-      await filehelper.say('in busy mode: ' + busyIndicator)
-      await filehelper.say('auto reply: ' + busyAnnouncement[0])
-
-    } else if (text === '#free') {
-      busyIndicator = false
-      await filehelper.say('auto reply stopped.')
-
-    }
-    else if (/^#busy/i.test(text)) {
-
-      busyIndicator = true
-      await filehelper.say('in busy mode: ' + 'ON')
-
-      const matches = text.match(/^#busy (.+)$/i)
-      if (!matches || !matches[1]) {
-        await filehelper.say('auto reply message: "' + busyAnnouncement[0] + '"')
-
-      } else {
-        // busyAnnouncement = matches[1]
-        await filehelper.say('set auto reply to: "' + busyAnnouncement[0] + '"')
-
-      }
-    }
-
     return
   }
+
+  if (/\@毕加索/.test(text)) {
+    await msg.say(atReturnText(text))
+    return
+  }
+
+  // if (receiver.id === 'filehelper') {
+  //   if (text === '#status') {
+  //     await filehelper.say('in busy mode: ' + busyIndicator)
+  //     await filehelper.say('auto reply: ' + busyAnnouncement[0])
+
+  //   } else if (text === '#free') {
+  //     busyIndicator = false
+  //     await filehelper.say('auto reply stopped.')
+
+  //   }
+  //   else if (/^#busy/i.test(text)) {
+
+  //     busyIndicator = true
+  //     await filehelper.say('in busy mode: ' + 'ON')
+
+  //     const matches = text.match(/^#busy (.+)$/i)
+  //     if (!matches || !matches[1]) {
+  //       await filehelper.say('auto reply message: "' + busyAnnouncement[0] + '"')
+
+  //     } else {
+  //       // busyAnnouncement = matches[1]
+  //       await filehelper.say('set auto reply to: "' + busyAnnouncement[0] + '"')
+
+  //     }
+  //   }
+
+  //   return
+  // }
 
   if (sender.type() !== bot.Contact.Type.Personal) {
     return
@@ -159,9 +183,8 @@ bot.on('message', async function(msg) {
    * 1. Send busy anoncement to contact
    */
 
-  const isHidden = () => { return Math.random() * 10 > 9 ? 1 : 0 }
   if (!room) {
-    await msg.say(busyAnnouncement[isHidden()])
+    await msg.say(atReturnText(text))
     return
   }
 
@@ -172,7 +195,8 @@ bot.on('message', async function(msg) {
   const contactList = await msg.mention()
   const contactIdList = contactList.map(c => c.id)
   if (contactIdList.includes(this.userSelf().id)) {
-    await msg.say(busyAnnouncement[isHidden()], sender)
+    atReturnText(text)
+    return
   }
   /**
    * 2. If there's someone mentioned me in a room,
